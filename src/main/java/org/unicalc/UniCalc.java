@@ -10,10 +10,17 @@ import java.util.List;
 import static org.exch.Currencies.*;
 
 public class UniCalc {
-    List<Currencies> knownCurrencies;
+    List<Currencies> knownCurrencies = Arrays.asList(UAH, USD, EUR, GBF);
+    Currencies defaultCurrencies = UAH;
+
+    CurExchanger exch;
+    boolean alreadyInitedExchanger;
 
     public UniCalc() {
-        knownCurrencies = Arrays.asList(UAH, USD, EUR, GBF);
+    }
+
+    public UniCalc(CurExchanger exch) {
+        this.exch = exch;
     }
 
     public int add(int a, int b) {
@@ -36,11 +43,27 @@ public class UniCalc {
         return Math.round(a / b);
     }
 
-    public int exchange(CurExchanger exch, Currencies cur, int value) throws UknownCurrencyException {
+    public int exchangeBack(Currencies cur, int value) throws UknownCurrencyException {
         if (!checkIfCurrencyIsKnown(cur))
             throw new UknownCurrencyException();
 
-        return exch.exchange(cur, value);
+        initExchangerIfNeeded();
+        return exch.exchange(defaultCurrencies, cur, value);
+    }
+
+    public int exchange(Currencies cur, int value) throws UknownCurrencyException {
+        if (!checkIfCurrencyIsKnown(cur))
+            throw new UknownCurrencyException();
+
+        initExchangerIfNeeded();
+        return exch.exchange(cur, defaultCurrencies, value);
+    }
+
+    private void initExchangerIfNeeded() {
+        if (!alreadyInitedExchanger) {
+            exch.init();
+            alreadyInitedExchanger = true;
+        }
     }
 
     private boolean checkIfCurrencyIsKnown(Currencies cur) {

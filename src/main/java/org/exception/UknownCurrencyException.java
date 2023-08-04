@@ -1,4 +1,4 @@
 package org.exception;
 
-public class UknownCurrencyException extends Exception{
+public class UknownCurrencyException extends Exception {
 }

@@ -1,7 +1,7 @@
 package org.exch;
 
 public interface CurExchanger {
-    int init();
+    void init();
 
-    int exchange(Currencies cur, int src);
+    int exchange(Currencies from, Currencies to, int value);
 }

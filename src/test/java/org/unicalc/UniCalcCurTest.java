@@ -19,13 +19,13 @@ public class UniCalcCurTest {
         //  Given
 
         CurExchanger exch = mock(CurExchanger.class);
-        when(exch.exchange(any(), anyInt())).thenReturn(100);
+        when(exch.exchange(any(), any(), anyInt())).thenReturn(100);
 
-        UniCalc calc = new UniCalc();
+        UniCalc calc = new UniCalc(exch);
 
         //  When
 
-        int result = calc.exchange(exch, Currencies.UAH, 1);
+        int result = calc.exchange(Currencies.UAH, 1);
 
         //  Then
 
@@ -34,36 +34,38 @@ public class UniCalcCurTest {
     }
 
     @Test
-    public void testUnknownCurrency(){
+    public void testUnknownCurrency() {
         //  Given
+        CurExchanger exch = mock(CurExchanger.class);
 
-        UniCalc calc = new UniCalc();
+        UniCalc calc = new UniCalc(exch);
 
         //  When & Then
 
         assertThrows(UknownCurrencyException.class,
-                ()->calc.exchange(null, Currencies.UNDEFINED, 1));
+                () -> calc.exchange(Currencies.UNDEFINED, 1));
     }
 
     @Test
-    public void testCESingleInitializing(){
+    public void testCESingleInitializing() throws UknownCurrencyException {
         //  Given
 
         CurExchanger exch = mock(CurExchanger.class);
-        when(exch.init()).thenReturn(100);
+        doNothing().when(exch).init();  //  Тут ми мокаємо поведінку ініціатора для Ексченджера, який є нашою залежністю
 
-        UniCalc calc = new UniCalc();
+        UniCalc calc = new UniCalc(exch);
 
-        //  When
+        //  When - Так як, нам потрібно пеерсвідчиися що ініціалізація Ексченджера виконується тільки один раз, ми
+        //  робимо два виклики методів, які потенційно можуть ініціалізувати Ексченджер, і нам не важливай зараз
+        //  результат цих методів
 
-        int result = calc.exchange(exch, Currencies.UAH, 1);
+        calc.exchange(Currencies.USD, 1);
+        calc.exchangeBack(Currencies.EUR, 1);
 
-        //  Then
+        //  Then - Тут ми перевіряємо ща метод ініціалізації Ексченджера викликаний тільки один раз, не зважаючи на те
+        //  скільки разів ми викликали залежні від нього методи нашого юніта
 
-        int expected = 100;
-        assertEquals(expected, result);
-
-        Mockito.verify(calc, times(1))
+        Mockito.verify(exch, times(1))
                 .init();
     }
 }
