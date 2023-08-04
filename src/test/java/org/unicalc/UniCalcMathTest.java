@@ -85,7 +85,7 @@ public class UniCalcMathTest {
     }
 
     @Test
-    public void testDivByZeroFloat() {
+    public void testDivByZeroFloat(){
         //  Given
 
         UniCalc calc = new UniCalc();
@@ -96,4 +96,6 @@ public class UniCalcMathTest {
         assertThrows(IllegalArgumentException.class,
                 () -> calc.divFloat(1f, 0f));
     }
+
+    public void testVoid(){}
 }
